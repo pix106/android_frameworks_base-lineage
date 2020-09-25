@@ -4401,6 +4401,50 @@ public class TelephonyManager {
     }
 
     /**
+     * Return if the current radio is LTE on CDMA for Subscription. This
+     * is a tri-state return value as for a period of time
+     * the mode may be unknown.
+     *
+     * @return {@link PhoneConstants#LTE_ON_CDMA_UNKNOWN}, {@link PhoneConstants#LTE_ON_CDMA_FALSE}
+     * or {@link PhoneConstants#LTE_ON_CDMA_TRUE} fot the subId returned by {@link getSubId()}
+     * @hide
+     */
+    @RequiresPermission(android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
+    @UnsupportedAppUsage
+    public int getLteOnCdmaMode() {
+        return getLteOnCdmaMode(getSubId());
+    }
+
+    /**
+     * Return if the current radio is LTE on CDMA for Subscription. This
+     * is a tri-state return value as for a period of time
+     * the mode may be unknown.
+     *
+     * @param subId for which radio is LTE on CDMA is returned
+     * @return {@link PhoneConstants#LTE_ON_CDMA_UNKNOWN}, {@link PhoneConstants#LTE_ON_CDMA_FALSE}
+     * or {@link PhoneConstants#LTE_ON_CDMA_TRUE}
+     * @hide
+     */
+    @RequiresPermission(android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE)
+    @UnsupportedAppUsage
+    public int getLteOnCdmaMode(int subId) {
+        try {
+            ITelephony telephony = getITelephony();
+            if (telephony == null)
+                return PhoneConstants.LTE_ON_CDMA_UNKNOWN;
+            return telephony.getLteOnCdmaModeForSubscriber(subId, getOpPackageName(),
+                    getAttributionTag());
+        } catch (RemoteException ex) {
+            // Assume no ICC card if remote exception which shouldn't happen
+            return PhoneConstants.LTE_ON_CDMA_UNKNOWN;
+        } catch (NullPointerException ex) {
+            // This could happen before phone restarts due to crashing
+            return PhoneConstants.LTE_ON_CDMA_UNKNOWN;
+        }
+>>>>>>> 3050207a641f (TelephonyManager: Add getLteOnCdmaMode() function for default subId)
+    }
+
+    /**
      * Get the card ID of the default eUICC card. If the eUICCs have not yet been loaded, returns
      * {@link #UNINITIALIZED_CARD_ID}. If there is no eUICC or the device does not support card IDs
      * for eUICCs, returns {@link #UNSUPPORTED_CARD_ID}.
